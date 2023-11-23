@@ -1,0 +1,141 @@
+let circleX = 0;
+let circleY = 0;
+let mouseDelay = 0.1;
+let initialDiameter = 20;
+let currentDiameter = initialDiameter;
+let maxDiameter = 100;
+let shaking = false; // 是否处于晃动状态
+let shakeStrength = 0; // 当前晃动强度
+let maxShakeStrength = 100; // 最大晃动强度
+let shakeSpeed = 2; // 晃动速度
+let lastShakeTime = 0; // 上次晃动的时间
+let defaultOpacity = 60;
+let currentOpacity = defaultOpacity;
+let maxOpacity = 225;
+let flowSpeed;
+let isMousePressed = false; // 鼠标长按状态
+let circles = []; // 圆形数组
+let lastCircleTime = 0; // 上一个圆形生成的时间戳
+let circleInterval = 100; // 生成圆形的时间间隔（毫秒）
+let pressStartTime;
+
+function setup() {
+ createCanvas(windowWidth, windowHeight);
+// background(0);
+ frameRate = (60);
+ noStroke(); // 取消圆圈描边
+ noCursor()
+}
+
+function draw() {
+ background(0,70);
+ let spaceBetween=20;
+ for(let horizontal=spaceBetween/2;horizontal<width;horizontal+=spaceBetween){
+ for(let vertical=spaceBetween/2;vertical<height;vertical+=spaceBetween){
+ 
+ let d=dist(mouseX,mouseY,horizontal,vertical);
+ if(d<=65){
+ let transparency=map(d,0,65,200,130);
+ fill(255,transparency);
+ let flowRadius=3+2*sin(frameCount*flowSpeed+horizontal+vertical);
+ ellipse(horizontal,vertical,flowRadius);
+ }else{
+ let transparency=map(noise(horizontal*2,vertical*2,frameCount*0.03),0,1,0,30);
+ fill(random(255),random(255),random(255),transparency);
+ ellipse(horizontal,vertical,3);
+ }
+ 
+ }
+ }
+ 
+ for(let i=0;i<circles.length;i++){
+ let circle=circles[i];
+ circle.opacity-=2;
+ 
+ if(isMousePressed){
+ circle.x=lerp(circle.x,mouseX,.05)
+ circle.y=lerp(circle.y,mouseY,.05)
+ }else{
+ circle.x=lerp(circle.x,circle.targetX,.05)
+ circle.y=lerp(circle.y,circle.targetY,.05)
+ }
+ 
+ if(circle.opacity>0){
+ fill(255,circle.opacity)
+ ellipse(circle.x,circle.y,circle.size)
+ }else{
+ circles.splice(i,1)
+ i--
+ }
+}
+ 
+ if(shaking==true){
+ let timeDifference=(millis()-lastShakeTime)/1000
+ shakeStrength=min(shakeStrength+timeDifference*shakeSpeed,maxShakeStrength)
+ lastShakeTime=millis()
+ currentDiameter+=timeDifference*10
+ circleX=mouseX+random(-shakeStrength,shakeStrength)
+ circleY=mouseY+random(-shakeStrength,shakeStrength)
+ currentOpacity=min(currentOpacity+=.8,maxOpacity)
+ flowSpeed=.25
+ 
+ }else{
+ circleX+=(mouseX-circleX)*mouseDelay
+ circleY+=(mouseY-circleY)*mouseDelay
+ currentDiameter-=2
+ if(currentDiameter<=initialDiameter){
+ currentDiameter=initialDiameter
+ }
+ currentOpacity=defaultOpacity
+ flowSpeed=.1
+ 
+ }
+ fill(255,currentOpacity)
+ ellipse(circleX,circleY,min(currentDiameter,maxDiameter))
+ 
+ if(isMousePressed&&millis()-lastCircleTime>=circleInterval){
+ let newCircle={
+ x:random(width),
+ y:random(height),
+ size:random(10,30),
+ opacity:random(230)
+ }
+ circles.push(newCircle)
+ lastCircleTime=millis()
+ }
+}
+
+function mousePressed() {
+ pressStartTime=millis()
+ lastShakeTime=millis()
+ shaking=true
+ currentDiameter=initialDiameter
+ isMousePressed=true
+ 
+}
+
+function mouseReleased() {
+ shaking=false
+ shakeStrength=0
+ currentOpacity=defaultOpacity
+ 
+ let pressDuration=millis()-pressStartTime;
+ let numCircles=map(pressDuration,300,7000,1,60);
+ for(let i=0;i<numCircles;i++){
+ let newCircle={
+ x:mouseX,
+ y:mouseY,
+ targetX:random(width),
+ targetY:random(height),
+ size:random(10,30),
+ opacity:random(230)
+ }
+ circles.push(newCircle)
+ }
+ isMousePressed=false
+ 
+}
+
+function windowResized() {
+ resizeCanvas(windowWidth,windowHeight)
+}
