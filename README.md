@@ -8,9 +8,9 @@ Hold LMB to charge, release to fire! (the longer you hold, the bigger the shockw
 
 ---
 
-> To preview the effect, use `Visual Studio Code` to open the entire root folder, then enable the `live server` plugin. (You can get it from the vs code extensions)
+To preview the effect, use `Visual Studio Code` to open the entire root folder, then enable the `live server` plugin. (You can get it from the vs code extensions)
 
-> To modify the code, go to `sketch.js`
+To modify the code, go to `sketch.js`
 
 ---
 
