@@ -114,8 +114,7 @@ function setup() {
     frameRate=(60); // Constant frame rate ensures a stable experience
     noStroke(); 
     noCursor(); // Hiding the mouse cursor increases immersion
-    print("Designed By Peter Qin");
-    print('Unikey: yqin6553')
+    print("Designed By GASP3D4L");
     print("The P0W3R Punch");
 }
 
